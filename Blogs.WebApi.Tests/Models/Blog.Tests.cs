@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using System;
 using Blogs.WebApi.Models;
 using Xunit;
@@ -11,19 +10,14 @@ namespace Blogs.WebApi.Tests.Models
         [InlineData(1,"url")]
         [InlineData(111111,"url       url")]
         [InlineData(1,"URL")]
-        public void Ctor_WithValidArguments_ShouldCreateAValidBlogInstance(int data1, string data2)
+        public void Ctor_WithValidArguments_ShouldCreateAValidBlogInstance(int id, string url)
         {
-            // arrange
-            var id  = (uint)data1;
-            var url = data2;
-            // act
-            var blog = new Blog(id, url);
+            var blog = new Blog((uint)id, url);
 
-            // assert
             Assert.NotNull(blog);
-            Assert.Equal(id,blog.Id);
+            Assert.Equal((uint)id,blog.Id);
             Assert.Equal(url, blog.Url);
-            Assert.InRange(id,uint.MinValue,uint.MaxValue);
+            Assert.InRange((uint)id,uint.MinValue,uint.MaxValue);
         }
 
         [Theory]
@@ -32,10 +26,33 @@ namespace Blogs.WebApi.Tests.Models
         [InlineData(null)]
         public void Ctor_WithInvalidUrl_ResultsArgumentNullException(string url)
         {
-        //Arrange
            var id = (uint)1;
-           // Act && Assert
+           
            Assert.Throws<ArgumentNullException>(() => new Blog(id,url));        
+        }
+
+        [Theory]
+        [InlineData("http")]
+        [InlineData("www")]
+        [InlineData("https")]
+        public void SetUrl_WithValidUrl_ShouldSetAValidBlogUrl(string url)
+        {
+            var blog = new Blog(1,"w");
+            
+            blog.SetUrl(url);
+            
+            Assert.Equal(url,blog.Url);
+        }
+
+        [Theory]
+        [InlineData("  ")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void SetUrl_WithInvalidUrl_ReturnsArgumentNullException(string url)
+        {
+            var blog = new Blog(1,"w");
+            
+            Assert.Throws<ArgumentNullException>(() => blog.SetUrl(url));
         }
     }
 }
