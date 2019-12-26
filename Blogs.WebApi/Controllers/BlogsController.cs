@@ -16,52 +16,54 @@ namespace Blogs.WebApi.Controllers
     public class BlogsController : ControllerBase
     {
         private readonly BloggingContext _bloggingContext;
-        private IBlogRepository BlogRepository;
-        private IPostRepository PostRepository;
-        
+        private readonly IBlogRepository BlogRepository;
+        private readonly IPostRepository PostRepository;
 
-        public BlogsController(DbContextOptions<BloggingContext> options)
+        public BlogsController(DbContextOptions<BloggingContext> options, IBlogRepository blogRepository = null,IPostRepository postRepository = null)
         {    
-            _bloggingContext = new BloggingContext(options);
+            _bloggingContext = new BloggingContext(options);    
             
-            BlogRepository = new BlogRepository(_bloggingContext);
-            
-            PostRepository = new PostRepository(_bloggingContext);
+            if(blogRepository != null)
+            {
+                BlogRepository = blogRepository;
+            }
+            else
+            {
+                BlogRepository = new BlogRepository(_bloggingContext);   
+            }
+
+            if(postRepository != null)
+            {
+                PostRepository = postRepository;
+            }
+            else
+            {
+                PostRepository = new PostRepository(_bloggingContext);   
+            }
         }
 
-        public void SetBlogRepository(BlogRepository blogRepository)
-        {
-            BlogRepository = blogRepository;   
-        }
-        public void SetPostRepository(PostRepository postRepository)
-        {
-            PostRepository = postRepository;   
-        }
-
-
-        //GET: api/Blogs
         [HttpGet]
-        public virtual async Task<ActionResult<IEnumerable<BlogViewModel>>> GetAsync()
+        public virtual async Task<ActionResult<IEnumerable<Blog>>> GetAsync()
         {
             var blogs = await BlogRepository.GetAsync();
 
             if (!blogs.Any())
-                return NoContent();
+                return NoContent();        
     
-            return Ok(blogs.Select(b => (BlogViewModel) b));
+            return Ok(blogs.Select(b => b));
         }
     
-        //GET: api/Blogs/id
         [HttpGet("{id}")]
-        public virtual async Task<ActionResult<BlogViewModel>> GetAsync(int id)
+        public virtual async Task<ActionResult<Blog>> GetAsync(int id)
         {
             var blog = await BlogRepository.GetAsync(id);
+
             if (blog == null)
                 return NotFound();
-            return Ok((BlogViewModel) blog);
+
+            return Ok(blog);
         }
     
-        //POST: api/Blogs
         [HttpPost]
         public virtual async Task<ActionResult<BlogViewModel>> PostAsync([FromBody] BlogInputModel inputModel)
         {
@@ -73,7 +75,6 @@ namespace Blogs.WebApi.Controllers
             return Created($"api/blogs/{inputModel.Id}", (BlogViewModel)inputModel);        
         }
 
-        //PUT: api/Blogs/id
         [HttpPut("{id}")]
         public virtual async Task<ActionResult> PutAsync(int id, [FromBody] BlogUpdateInputModel inputModel)
         {
@@ -81,6 +82,7 @@ namespace Blogs.WebApi.Controllers
                 return BadRequest();
 
             var blog = await BlogRepository.GetAsync(id);
+
             if(blog == null)
                 return NotFound();
             
@@ -90,7 +92,6 @@ namespace Blogs.WebApi.Controllers
             return Ok();
         }
     
-        //DELETE: api/Blogs
         [HttpDelete("{id}")]
         public virtual async Task<ActionResult> DeleteAsync(int id)
         {
@@ -104,11 +105,11 @@ namespace Blogs.WebApi.Controllers
             return Ok();
         }
 
-        //GET: api/Blogs/id/Posts
         [HttpGet("{id}/Posts")]
         public virtual async Task<ActionResult<IEnumerable<PostViewModel>>>GetPostAsync(int id)
         {
             var blog = await BlogRepository.GetAsync(id);
+
             if(blog == null)
                 return NotFound();
             
@@ -120,7 +121,6 @@ namespace Blogs.WebApi.Controllers
             return Ok(posts.Select(p => (PostViewModel) p));
         }
         
-        //POST: api/Blogs/id/Posts
         [HttpPost("{id}/Posts")]
         public virtual async Task<ActionResult<PostViewModel>> PostAsync(int id,[FromBody] PostInputModel inputModel)
         {
@@ -136,10 +136,11 @@ namespace Blogs.WebApi.Controllers
             return Created($"api/Blogs/{post.Id}/Posts", (PostViewModel) post);
         }
 
-        //PUT: api/Blogs/id/Posts/idp
         [HttpPut("{id}/Posts/{idPost}")]
         public virtual async Task<ActionResult> PutAsync(int id, int idPost,[FromBody] PostUpdateInputModel inputModel)
         {
+            var blogId = (uint)id;
+
             var blog = await BlogRepository.GetAsync(id);
             
             if(blog == null)
@@ -150,14 +151,15 @@ namespace Blogs.WebApi.Controllers
             if(post == null)
                 return NotFound();          
             
-            post.Update(inputModel);
-
+            if(inputModel.BlogId != 0)
+                blogId = inputModel.BlogId;
+            
+            post.Update(blogId,inputModel.Content,inputModel.Title);
             await PostRepository.PutAsync(post);
 
             return Ok();
         }
 
-        //DELETE: api/Blogs/id/Posts/idp
         [HttpDelete("{id}/Posts/{idPost}")]
         public virtual async Task<ActionResult> DeleteAsync(int id, int idPost)
         {
