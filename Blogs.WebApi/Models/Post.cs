@@ -36,7 +36,6 @@ namespace Blogs.WebApi.Models
         {
             if (string.IsNullOrWhiteSpace(content))
                 throw new ArgumentNullException(nameof(content));
-
             Content = content;
         }
 
@@ -44,16 +43,21 @@ namespace Blogs.WebApi.Models
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentNullException(nameof(title));
-
             Title = title;
         }
 
-        public void Update(PostUpdateInputModel inputModel)
+        public void Update(uint blogId, string content, string title )
         {
-                if(inputModel.BlogId != 0)
-                    BlogId = inputModel.BlogId; 
-                Content = inputModel.Content;
-                Title = inputModel.Title;
+            if(blogId < uint.MinValue || blogId > uint.MaxValue)
+                throw new ArgumentOutOfRangeException(nameof(blogId));    
+            
+            BlogId = blogId;
+
+            if(!string.IsNullOrWhiteSpace(content)) 
+                SetContent(content);
+            
+            if(!string.IsNullOrWhiteSpace(title))
+                SetTitle(title);
         }
 
         public static implicit operator Post(PostInputModel inputModel)
