@@ -14,14 +14,18 @@ namespace Blogs.WebApi.Models
         protected Blog()
         {        
         }
+
         public Blog(uint id, string url)
-        {
+        {   
             Id  = id;
+            
             if(string.IsNullOrWhiteSpace(url))
                 throw new ArgumentNullException();
+            
             Url = url;
             Posts = new List<Post>();
         }
+        
         public void SetUrl(string url)
         {
             if(string.IsNullOrWhiteSpace(url))
@@ -41,18 +45,5 @@ namespace Blogs.WebApi.Models
                 Posts = new List<Post>()
             };
         }
-
-        // public static implicit operator Blog(BlogUpdateInputModel updateBlog)
-        // {
-        //     if (updateBlog == null)
-        //         return null;
-
-        //     return new Blog
-        //     {
-        //         Id = 1,
-        //         Url = updateBlog.Url,
-        //         Posts = new List<Post>()
-        //     };
-        // }
     }
 } 

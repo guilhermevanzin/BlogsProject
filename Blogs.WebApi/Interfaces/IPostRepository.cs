@@ -4,7 +4,7 @@ using Blogs.WebApi.Models;
 
 namespace Blogs.WebApi.Interfaces
 {
-    interface IPostRepository
+    public interface IPostRepository
     {
         Task<IEnumerable<Post>> GetAsync(Blog blog);
         Task<Post> GetAsync(int id);

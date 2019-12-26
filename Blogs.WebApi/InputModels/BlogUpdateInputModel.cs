@@ -9,13 +9,11 @@ namespace Blogs.WebApi.InputModels
 
         protected BlogUpdateInputModel()
         {
-            
         }
+        
         public BlogUpdateInputModel(string url)
         {
             Url = url;
         }
-
-        
     }
 }

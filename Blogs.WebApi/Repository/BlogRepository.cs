@@ -40,6 +40,7 @@ namespace Blogs.WebApi.Repository
             _bloggingContext.Blogs.Update(blog);
             await _bloggingContext.SaveChangesAsync();
         }
+        
         public virtual async Task DeleteAsync(Blog blog)
         {
             _bloggingContext.Blogs.Remove(blog);

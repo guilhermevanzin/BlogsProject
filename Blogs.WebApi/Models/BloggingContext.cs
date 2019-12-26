@@ -8,14 +8,15 @@ namespace Blogs.WebApi.Models
         : base(options)
         {
         }
+
         public virtual DbSet<Blog> Blogs {get;set;}
         public virtual DbSet<Post> Posts {get;set;}
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Blog>()
             .HasIndex(b => b.Url)
             .IsUnique();
         }
-
     }
 }

@@ -10,10 +10,12 @@ namespace Blogs.WebApi.Repository
     public class PostRepository : IPostRepository 
     {
         private readonly BloggingContext _bloggingContext;
+
         public PostRepository(BloggingContext _context)
         {
             _bloggingContext = _context;
         }
+
         public PostRepository()
         {
         }
@@ -21,15 +23,13 @@ namespace Blogs.WebApi.Repository
         public virtual async Task<Post> GetAsync(int idPost)
         {
             var posts =  await _bloggingContext.Posts.ToListAsync();
-
             return posts.FirstOrDefault(p => p.Id == idPost);
         }
 
         public virtual async Task<IEnumerable<Post>> GetAsync(Blog blog)
         {
             var posts = await _bloggingContext.Posts.ToListAsync();
-            return posts.FindAll(p => p.BlogId == blog.Id);
-            
+            return posts.FindAll(p => p.BlogId == blog.Id);     
         }
 
         public virtual async Task PostAsync(Post post)

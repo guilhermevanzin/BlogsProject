@@ -7,24 +7,20 @@ namespace Blogs.WebApi.InputModels
     {
         [Required]
         public uint Id {get; set;}
-
         [Required]
         public string Title {get;set;}
-        
         [Required]
         public string Content {get;set;}
 
-        public static implicit operator PostInputModel (Post inputModel)
+        protected PostInputModel()
         {
-            if (inputModel == null)
-                return null;
+        }
 
-            return new PostInputModel
-            {
-                Id = inputModel.Id,
-                Title = inputModel.Title,
-                Content = inputModel.Content
-            };
+        public PostInputModel(uint id, string title, string content)
+        {
+            Id = id;
+            Title = title;
+            Content = content;
         }
     }
 }
